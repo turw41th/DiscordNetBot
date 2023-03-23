@@ -1,13 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
+﻿using System.Text.RegularExpressions;
 
 namespace DiscordNetBot
 {
-    internal class CommandMethods
+    internal static class CommandMethods
     {
         private static readonly Random random = new Random();
         private static List<int> availableDice = new List<int>()
@@ -59,7 +54,7 @@ namespace DiscordNetBot
             {
                 result += $"{modifier}";
             }
-            result += $": {total}";
+            result += $" for a total of: {total}";
 
             return result;
         }

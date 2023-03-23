@@ -1,7 +1,7 @@
-﻿using System;
-using System.Threading.Tasks;
-using Discord;
+﻿using Discord;
+using Discord.Net;
 using Discord.WebSocket;
+using Newtonsoft.Json;
 
 namespace DiscordNetBot
 {
@@ -10,14 +10,19 @@ namespace DiscordNetBot
         public static Task Main(string[] args) => new Program().MainAsync();
 
         private DiscordSocketClient _client;
+        private MessageHandler _messageHandler;
 
         public async Task MainAsync()
         {
+            _messageHandler = new MessageHandler();
             _client = new DiscordSocketClient();
 
-            _client.MessageReceived += new MessageHandler().CommandHandler;
+            _client.MessageReceived += _messageHandler.CommandHandler;
 
             _client.Log += Log;
+
+            _client.Ready += Client_Ready;
+            _client.SlashCommandExecuted += _messageHandler.SlashCommandHandler;
            
             var token = File.ReadAllText("Resources\\DiscordNetBot_token.txt");
 
@@ -25,6 +30,23 @@ namespace DiscordNetBot
             await _client.StartAsync();
 
             await Task.Delay(-1);
+        }
+
+        public async Task Client_Ready()
+        {
+            var globalRollCommand = new SlashCommandBuilder();
+            globalRollCommand.WithName("roll");
+            globalRollCommand.WithDescription("This is a dice rolling command!");
+            globalRollCommand.AddOption("parameter", ApplicationCommandOptionType.String, "Format: XdY+Z", isRequired: true);
+
+            try
+            {
+                await _client.CreateGlobalApplicationCommandAsync(globalRollCommand.Build());
+            } catch (ApplicationCommandException ex)
+            {
+                var json = JsonConvert.SerializeObject(ex.Errors, Formatting.Indented);
+                Console.WriteLine(json);
+            }
         }
 
         private Task Log(LogMessage msg)

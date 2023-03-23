@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Discord;
-using Discord.WebSocket;
+﻿using Discord.WebSocket;
 
 namespace DiscordNetBot
 {
@@ -38,6 +32,20 @@ namespace DiscordNetBot
             }
 
             return Task.CompletedTask;
+        }
+
+        public async Task SlashCommandHandler(SocketSlashCommand command)
+        {
+            switch (command.CommandName)
+            {
+                case "roll":
+                    var message = command.Data.Options.First().Value as string;
+
+                    await command.RespondAsync(CommandMethods.RollCommand(message));
+                    break;
+            }
+
+            
         }
 
     }
